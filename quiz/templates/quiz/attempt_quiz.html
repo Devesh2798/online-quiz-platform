@@ -1,0 +1,29 @@
+{% extends 'quiz/base.html' %}
+{% block title %}Attempt Quiz{% endblock %}
+{% block content %}
+<h2>{{ quiz.name }}</h2>
+<p>{{ quiz.description }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <ul class="list-group">
+        {% for question in questions %}
+            <li class="list-group-item">
+                <strong>Question {{ forloop.counter }}:</strong> {{ question.text }}<br>
+                {% for answer in question.answers.all %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="answer_{{ answer.id }}" value="{{ answer.id }}">
+                        <label class="form-check-label" for="answer_{{ answer.id }}">
+                            {{ answer.text }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-primary mt-3">Submit Quiz</button>
+</form>
+
+
+
+{% endblock %}

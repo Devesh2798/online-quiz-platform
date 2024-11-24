@@ -1,0 +1,94 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Add Question{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Add New Question in "{{ quiz.name }}"</h2>
+    {% if messages %}
+        <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="text">Question Text</label>
+            <input type="text" class="form-control" id="text" name="text" required>
+        </div>
+        <div class="form-group">
+            <label for="question_type">Question Type</label>
+            <select class="form-control" id="question_type" name="question_type">
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="true_false">True/False</option>
+            </select>
+        </div>
+
+        <div id="options-section">
+            <div class="form-group">
+                <label for="option_1">Option 1:</label>
+                <input type="text" class="form-control" id="option_1" name="option_1" required>
+            </div>
+            <div class="form-group">
+                <label for="option_2">Option 2:</label>
+                <input type="text" class="form-control" id="option_2" name="option_2" required>
+            </div>
+            <div class="form-group">
+                <label for="option_3">Option 3:</label>
+                <input type="text" class="form-control" id="option_3" name="option_3" required>
+            </div>
+            <div class="form-group">
+                <label for="option_4">Option 4:</label>
+                <input type="text" class="form-control" id="option_4" name="option_4" required>
+            </div>
+            <div class="form-group">
+                <label for="correct_option">Select Correct Option:</label>
+                <select class="form-control" id="correct_option" name="correct_option">
+                    <option value="0">---Select Correct Option---</option>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                    <option value="4">Option 4</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="true-false-options" style="display: none;">
+            <div class="form-group">
+                <label for="true_false_correct_option">Select Correct Answer:</label>
+                <select class="form-control" id="true_false_correct_option" name="true_false_correct_option">
+                    <option value="0">---Select Correct Option---</option>
+                    <option value="True">True</option>
+                    <option value="False">False</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Add Question</button>
+        <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const questionTypeSelect = document.getElementById('question_type');
+    const optionsSection = document.getElementById('options-section');
+    const trueFalseOptions = document.getElementById('true-false-options');
+
+    questionTypeSelect.addEventListener('change', () => {
+        const selectedType = questionTypeSelect.value;
+
+        if (selectedType === 'multiple_choice') {
+            optionsSection.style.display = 'block';
+            trueFalseOptions.style.display = 'none';
+        } else if (selectedType === 'true_false') {
+            optionsSection.style.display = 'none';
+            trueFalseOptions.style.display = 'block';
+        }
+    });
+});
+</script>
+{% endblock %}

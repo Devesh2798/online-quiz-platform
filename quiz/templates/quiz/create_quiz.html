@@ -1,0 +1,125 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Create Quiz{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Create a Quiz</h2>
+    {% if messages %}
+        <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <fieldset>
+            <legend>Quiz Details</legend>
+            <div class="form-group">
+                <label for="{{ quiz_form.name.id_for_label }}">{{ quiz_form.name.label }}</label>
+                <input type="text" name="{{ quiz_form.name.name }}" id="{{ quiz_form.name.id_for_label }}" class="form-control" value="{{ quiz_form.name.value|default:'' }}" required>
+            </div>
+            <div class="form-group">
+                <label for="{{ quiz_form.description.id_for_label }}">{{ quiz_form.description.label }}</label>
+                <textarea name="{{ quiz_form.description.name }}" id="{{ quiz_form.description.id_for_label }}" class="form-control" required>{{ quiz_form.description.value|default:'' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="{{ quiz_form.category.id_for_label }}">{{ quiz_form.category.label }}</label>
+                <select name="{{ quiz_form.category.name }}" id="{{ quiz_form.category.id_for_label }}" class="form-select" required>
+                    <option value="0">---Select Category---</option>
+                    {% for category in quiz_form.category.field.queryset %}
+                        <option value="{{ category.id }}" {% if category.id == quiz_form.category.value %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="{{ quiz_form.new_category.id_for_label }}">{{ quiz_form.new_category.label }}</label>
+                <input type="text" name="{{ quiz_form.new_category.name }}" id="{{ quiz_form.new_category.id_for_label }}" class="form-control" value="{{ quiz_form.new_category.value|default:'' }}">
+            </div>
+        </fieldset>
+        
+        <fieldset id="questions-section">
+            <legend>Questions</legend>
+            {{ question_formset.management_form }}
+            <div id="questions">
+                {% for form in question_formset %}
+                    <div class="question-form" data-id="{{ forloop.counter0 }}">
+                        {{ form.as_p }}
+                        <div class="answers-section"></div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-question" class="btn btn-secondary mt-3">Add Another Question</button>
+        </fieldset>
+        
+        <button type="submit" class="btn btn-primary mt-4">Create Quiz</button>
+        <br>
+        <a style="margin-top: 5px;" href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+    </form>
+</div>
+
+<script>
+// JavaScript code for adding question functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const questionsSection = document.getElementById('questions');
+    const totalForms = document.querySelector('input[name="questions-TOTAL_FORMS"]');
+
+    // Add Another Question
+    document.getElementById('add-question').addEventListener('click', () => {
+        const formIndex = parseInt(totalForms.value); // Current total forms count
+        const newForm = questionsSection.children[0].cloneNode(true); // Clone the first question form
+
+        // Update indices for the new form
+        newForm.setAttribute('data-id', formIndex);
+        newForm.innerHTML = newForm.innerHTML.replace(/-0-/g, `-${formIndex}-`);
+        newForm.querySelector('.answers-section').innerHTML = ''; // Clear previous answer fields
+        questionsSection.appendChild(newForm);
+
+        // Increment the total forms count
+        totalForms.value = formIndex + 1;
+    });
+
+    // Handle Answer Fields Rendering Based on Question Type
+    document.addEventListener('change', (e) => {
+        if (e.target && e.target.name.includes('question_type')) {
+            const questionForm = e.target.closest('.question-form');
+            const questionId = questionForm.getAttribute('data-id');
+            const questionType = e.target.value;
+            const answersSection = questionForm.querySelector('.answers-section');
+
+            if (questionType === 'multiple_choice') {
+                answersSection.innerHTML = `
+                    <label>Option 1: <input type="text" name="questions-${questionId}-option_1" class="form-control"></label>
+                    <label>Option 2: <input type="text" name="questions-${questionId}-option_2" class="form-control"></label>
+                    <label >Option 3: <input type="text" name="questions-${questionId}-option_3" class="form-control"></label>
+                    <label>Option 4: <input type="text" name="questions-${questionId}-option_4" class="form-control"></label>
+                    <label>Correct Option:
+                        <select name="questions-${questionId}-correct_option" class="form-select">
+                            <option value="0">---Select---</option>
+                            <option value="1">Option 1</option>
+                            <option value="2">Option 2</option>
+                            <option value="3">Option 3</option>
+                            <option value="4">Option 4</option>
+                        </select>
+                    </label>
+                `;
+            } else if (questionType === 'true_false') {
+                answersSection.innerHTML = `
+                    <label>Correct Answer:
+                        <select name="questions-${questionId}-correct_option" class="form-select">
+                            <option value="0">---Select---</option>
+                            <option value="True">True</option>
+                            <option value="False">False</option>
+                        </select>
+                    </label>
+                `;
+            } else {
+                answersSection.innerHTML = ''; // Clear answers section for other types
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

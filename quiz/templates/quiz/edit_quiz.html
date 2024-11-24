@@ -1,0 +1,35 @@
+{% extends 'quiz/base.html' %}
+{% block title %}Edit Quiz{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Quiz</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <!-- Quiz Details -->
+        <div class="form-group">
+            <label for="name">Quiz Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ quiz.name }}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" required>{{ quiz.description }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select class="form-control" id="category" name="category">
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id == quiz.category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+
+    <div class="mt-4">
+        <h4>More Actions</h4>
+        <a href="{% url 'edit_question' quiz.id %}" class="btn btn-warning">Edit Question</a>
+        <a href="{% url 'delete_question' quiz.id %}" class="btn btn-danger">Delete Question</a>
+        <a href="{% url 'add_question' quiz.id %}" class="btn btn-success">Add Question</a>
+    </div>
+</div>
+{% endblock %}

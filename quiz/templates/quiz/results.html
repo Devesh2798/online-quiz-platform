@@ -1,0 +1,41 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Quiz Results{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if messages %}
+        <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <h2>{{ quiz.name }} - Result</h2>
+    <p>Name: {{user.first_name}} {{user.last_name}}  </p>
+    <p>You scored {{ score }} out of {{ total_questions }}.</p>
+    <p>Your score: {{ percentage }}%</p>
+
+    <h3>Question and Answers</h3>
+    <ul class="list-group">
+        {% for data in question_data %}
+            <li class="list-group-item">
+                <strong>Question {{ forloop.counter }}:</strong> {{ data.question.text }}<br>
+
+                {% if data.user_answer %}
+                    <strong>Your Answer:</strong> {{ data.user_answer.text }}<br>
+                    {% if data.is_correct %}
+                        <span class="text-success"><strong>Correct!</strong></span><br>
+                    {% else %}
+                        <span class="text-danger"><strong>Incorrect!</strong></span><br>
+                        <strong>Correct Answer:</strong> {{ data.correct_answer.text }}<br>
+                    {% endif %}
+                {% else %}
+                    <strong>No answer selected.</strong><br>
+                    <strong>Correct Answer:</strong> {{ data.correct_answer.text }}<br>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'quiz/base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if messages %}
+        <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <h2 class="mb-4 text-center">Welcome to the Quiz Platform</h2>
+    <div class="row">
+
+        <!-- Take Quiz Card -->
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-question-circle-fill" style="font-size: 3rem; color: #007bff;"></i>
+                    <h5 class="card-title mt-3">Take a Quiz</h5>
+                    <p class="card-text">Challenge yourself by attempting one of our quizzes!</p>
+                    <a href="{% url 'take_quiz' %}" class="btn btn-primary">Start Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Quiz Card -->
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-pencil-square" style="font-size: 3rem; color: #28a745;"></i>
+                    <h5 class="card-title mt-3">Create a Quiz</h5>
+                    <p class="card-text">Share your knowledge by creating a quiz for others!</p>
+                    <br>
+                    <a href="{% url 'create_quiz' %}" class="btn btn-success">Create Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Quiz Card -->
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-gear-fill" style="font-size: 3rem; color: #17a2b8;"></i>
+                    <h5 class="card-title mt-3">Manage Quiz</h5>
+                    <p class="card-text">Edit or delete quizzes you’ve created.</p>
+                    <br>
+                    <a href="{% url 'manage_quiz' %}" class="btn btn-info">Manage Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Card -->
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-trophy-fill" style="font-size: 3rem; color: #ffc107;"></i>
+                    <h5 class="card-title mt-3">Leaderboard</h5>
+                    <p class="card-text">See how you rank among other quiz takers!</p>
+                    <br>
+                    <a href="{% url 'leaderboard' %}" class="btn btn-warning">View Leaderboard</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

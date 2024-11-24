@@ -1,0 +1,140 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Edit Question{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Questions for Quiz: {{ quiz.name }}</h2>
+    {% if messages %}
+    <div class="alert alert-success" role="alert">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
+    <h3>Available Questions:</h3>
+    <ul class="list-group mb-4">
+        {% for q in questions %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ q.text }} 
+                <button class="btn btn-primary btn-sm" onclick="toggleEditForm({{ q.id }})">Edit</button>
+            </li>
+            <div id="edit-form-{{ q.id }}" class="edit-form" style="display: none;">
+                <h4>Editing Question: {{ q.text }}</h4>
+                <form method="POST" action="{% url 'edit_question' quiz.id %}?question_id={{ q.id }}" class="border p-4 rounded">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Question Text:</label>
+                        <input type="text" name="text" class="form-control" value="{{ q.text }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="question_type" class="form-label">Question Type:
+                        {% if q.question_type == 'multiple_choice' %}
+                        Mulitple Choice
+                        {% endif %}
+                        {% if q.question_type == 'true_false' %}
+                        True or False
+                        {% endif %}
+                    </label>
+                    </div>
+
+                    <div id="options-section-{{ q.id }}">
+                        <h4>Options:</h4>
+                        {% for option in q.answers.all %}
+                            <div class="mb-3">
+                                <input type="text" name="option_{{ option.id }}" class="form-control" value="{{ option.text }}" required>
+                                <div class="form-check">
+                                    <input type="checkbox" name="is_correct_{{ option.id }}" class="form-check-input" {% if option.is_correct %}checked{% endif %}>
+                                    <label class="form-check-label">Correct Answer</label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleEditForm({{ q.id }})">Cancel</button>
+                </form>
+            </div>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+    function toggleEditForm(questionId) {
+        // Close all other edit forms
+        var allEditForms = document.querySelectorAll('.edit-form');
+        allEditForms.forEach(function(form) {
+            if (form.id !== 'edit-form-' + questionId) {
+                form.style.display = 'none';
+            }
+        });
+
+        // Toggle the selected edit form
+        var editForm = document.getElementById('edit-form-' + questionId);
+        if (editForm.style.display === "none" || editForm.style.display === "") {
+            editForm.style.display = "block";
+        } else {
+            editForm.style.display = "none";
+        }
+    }
+
+    function updateOptions(questionId) {
+        const questionType = document.querySelector(`select[name="question_type"]`).value;
+        const optionsSection = document.getElementById(`options-section-${questionId}`);
+
+        if (questionType === 'multiple_choice') {
+            optionsSection.innerHTML = `
+                <h4>Options:</h4>
+                <div class="mb-3">
+                    <input type="text" name="option_1" class="form-control" placeholder="Option 1" required>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_correct_1" class="form-check-input">
+                        <label class="form-check-label">Correct Answer</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="option_2" class="form-control" placeholder="Option 2" required>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_correct_2" class="form-check-input">
+                        <label class="form-check-label">Correct Answer</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="option_3" class="form-control" placeholder="Option 3" required>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_correct_3" class="form-check-input">
+                        <label class="form-check-label">Correct Answer</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="option_4" class="form-control" placeholder="Option 4" required>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_correct_4" class="form-check-input">
+                        <label class="form-check-label">Correct Answer</label>
+                    </div>
+                </div>
+            `;
+        } else if (questionType === 'true_false') {
+            optionsSection.innerHTML = `
+                <h4>Options:</h4>
+                <div class="mb-3">
+                    <input type="text" name="option_true" class="form-control" value="True" required>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_correct_true" class="form-check-input">
+                        <label class="form-check-label">Correct Answer</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="option_false" class="form-control" value="False" required>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_correct_false" class="form-check-input">
+                        <label class="form-check-label">Correct Answer</label>
+                    </div>
+                </div>
+            `;
+        }
+    }
+</script>
+
+{% endblock %}
